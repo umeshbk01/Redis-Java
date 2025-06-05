@@ -33,8 +33,8 @@ public class RedisReply {
             case BULK_STRING:
                 byte[] body = payload.getBytes(StandardCharsets.UTF_8);
                 byte[] headerBytes = ("$" + body.length + "\r\n").getBytes(StandardCharsets.UTF_8);
-                byte[] clrf = "\r\n".getBytes(StandardCharsets.UTF_8);
-                byte[] result = new Byte[headerBytes.length + body.length + crlf.length];
+                byte[] crlf = "\r\n".getBytes(StandardCharsets.UTF_8);
+                byte[] result = new byte[headerBytes.length + body.length + crlf.length];
                 System.arraycopy(headerBytes, 0, result, 0, headerBytes.length);
                 System.arraycopy(body, 0, result, headerBytes.length, body.length);
                 System.arraycopy(crlf, 0, result, headerBytes.length + body.length, crlf.length);
