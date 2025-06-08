@@ -3,6 +3,7 @@ package com.java.redis.internal;
 import com.java.redis.internal.command.CommandExecutor;
 import com.java.redis.internal.config.Config;
 import com.java.redis.internal.config.ConfigLoader;
+import com.java.redis.internal.datastore.DataStore;
 import com.java.redis.internal.network.BasicSocketServer;
 import com.java.redis.internal.network.NetworkServer;
 import com.java.redis.internal.persistence.NoOpPersistence;
@@ -20,7 +21,9 @@ public class Main {
         PersistenceHandler persistence = new NoOpPersistence();
         persistence.load(null);
 
-        CommandExecutor executor = new CommandExecutor();
+        // 2) Initialize in-memory DataStore
+        DataStore store = new DataStore();
+        CommandExecutor executor = new CommandExecutor(store);
 
         NetworkServer server = new BasicSocketServer();
         try {

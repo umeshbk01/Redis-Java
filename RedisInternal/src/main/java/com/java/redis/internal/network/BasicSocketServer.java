@@ -23,7 +23,7 @@ public class BasicSocketServer implements NetworkServer{
                 Command cmd = parser.parse();
                 System.out.println("Command received: " + cmd);
                 RedisReply reply = executor.execute(cmd);
-                out.write(reply.toByte());
+                out.write(reply.toBytes());
             }
         } catch (IOException ioe) {
             System.err.println("Error handling client: " + ioe.getMessage());
