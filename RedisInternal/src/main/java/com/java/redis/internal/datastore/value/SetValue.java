@@ -9,7 +9,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SetValue implements RedisValue {
-    // Using ConcurrentHashMap’s keySet for thread-safe set
+    /** Using ConcurrentHashMap’s keySet for thread-safe set
+     *
+     */
     private final Set<String> set = ConcurrentHashMap.newKeySet();
 
     /**

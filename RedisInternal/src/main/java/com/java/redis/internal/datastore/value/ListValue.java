@@ -8,6 +8,11 @@ import java.util.ArrayDeque;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * ListValue represents a Redis list data structure.
+ * This implementation uses a LinkedList to allow efficient push operations.
+ */
+
 public class ListValue implements RedisValue {
     private final LinkedList<String> list = new LinkedList<>();
 

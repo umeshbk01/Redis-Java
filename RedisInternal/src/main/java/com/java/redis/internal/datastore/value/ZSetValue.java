@@ -7,6 +7,11 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
+/**
+ * ZSetValue represents a Redis sorted set data structure.
+ * This implementation uses a ConcurrentHashMap for O(1) lookups
+ * and a ConcurrentSkipListMap to maintain sorted order
+ */
 public class ZSetValue implements RedisValue {
     // Map member → score for O(1) lookups
     private final ConcurrentHashMap<String, Double> scoreMap = new ConcurrentHashMap<>();
