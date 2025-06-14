@@ -8,6 +8,7 @@ import com.java.redis.internal.network.BasicSocketServer;
 import com.java.redis.internal.network.NetworkServer;
 import com.java.redis.internal.persistence.NoOpPersistence;
 import com.java.redis.internal.persistence.PersistenceHandler;
+import com.java.redis.internal.server.NettyServer;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -25,13 +26,19 @@ public class Main {
         DataStore store = new DataStore();
         CommandExecutor executor = new CommandExecutor(store);
 
-        NetworkServer server = new BasicSocketServer();
+        NettyServer server = new NettyServer(port, executor);
         try {
-            server.start(port, executor);
+            server.start();
         } catch (Exception e) {
             System.err.println("Failed to start server: " + e.getMessage());
             e.printStackTrace();
+        }finally{
+            try {
+                server.stop();
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
-
     }
 }

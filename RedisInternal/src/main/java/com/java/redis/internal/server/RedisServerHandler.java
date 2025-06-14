@@ -24,7 +24,7 @@ public class RedisServerHandler extends ChannelInboundHandlerAdapter{
         RespParser parser = new RespParser(in);
         try{
             Command cmd = parser.parse();
-            Executors.newThreadPerTaskExecutor(Thread.ofVirtual())
+            Executors.newThreadPerTaskExecutor(Thread.ofVirtual().factory())
                 .execute(() -> {
                     RedisReply reply = commandExecutor.execute(cmd);
                     ctx.writeAndFlush(Unpooled.copiedBuffer(reply.toBytes()));
