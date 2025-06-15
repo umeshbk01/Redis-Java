@@ -11,6 +11,16 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
+/**
+ * NettyServer: A server implementation using Netty framework
+ * This class is responsible for starting and stopping the server,
+ * handling incoming connections, and delegating command execution.
+ * It uses Netty's event-driven architecture to handle network operations efficiently.
+ * 
+ * Note: This is a simplified version and does not include all the necessary error handling
+ * and configuration options that a production server would require.
+ * It is intended to demonstrate the basic structure and flow of a Netty-based server.
+ */
 public class NettyServer {
     private final int port;
     private final CommandExecutor commandExecutor;
