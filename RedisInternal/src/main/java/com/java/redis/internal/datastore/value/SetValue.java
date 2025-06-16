@@ -3,12 +3,13 @@ package com.java.redis.internal.datastore.value;
 import com.java.redis.internal.constants.DataType;
 import com.java.redis.internal.datastore.RedisValue;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class SetValue implements RedisValue {
+public class SetValue implements RedisValue, Serializable {
     /** Using ConcurrentHashMap’s keySet for thread-safe set
      *
      */

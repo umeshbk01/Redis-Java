@@ -3,6 +3,7 @@ package com.java.redis.internal.datastore.value;
 import com.java.redis.internal.constants.DataType;
 import com.java.redis.internal.datastore.RedisValue;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -12,7 +13,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
  * This implementation uses a ConcurrentHashMap for O(1) lookups
  * and a ConcurrentSkipListMap to maintain sorted order
  */
-public class ZSetValue implements RedisValue {
+public class ZSetValue implements RedisValue, Serializable {
     // Map member → score for O(1) lookups
     private final ConcurrentHashMap<String, Double> scoreMap = new ConcurrentHashMap<>();
     // Sorted map score → set of members with that score, for range queries

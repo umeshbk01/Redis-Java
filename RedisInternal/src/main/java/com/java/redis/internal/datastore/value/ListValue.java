@@ -3,6 +3,7 @@ package com.java.redis.internal.datastore.value;
 import com.java.redis.internal.constants.DataType;
 import com.java.redis.internal.datastore.RedisValue;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayDeque;
 import java.util.LinkedList;
@@ -13,7 +14,7 @@ import java.util.List;
  * This implementation uses a LinkedList to allow efficient push operations.
  */
 
-public class ListValue implements RedisValue {
+public class ListValue implements RedisValue, Serializable {
     private final LinkedList<String> list = new LinkedList<>();
 
     /**

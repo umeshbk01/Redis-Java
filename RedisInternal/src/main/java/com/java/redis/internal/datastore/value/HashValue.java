@@ -3,13 +3,14 @@ package com.java.redis.internal.datastore.value;
 import com.java.redis.internal.constants.DataType;
 import com.java.redis.internal.datastore.RedisValue;
 
+import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 /*
     * HashValue represents a Redis hash data structure.
     * * This implementation uses a ConcurrentHashMap to ensure thread-safety
     * and allows concurrent access to the hash.
  */
-public class HashValue implements RedisValue {
+public class HashValue implements RedisValue, Serializable {
     private final ConcurrentHashMap<String, String> map = new ConcurrentHashMap<>();
 
     /**
