@@ -9,16 +9,35 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
 public class DataStore {
-    private final ConcurrentHashMap<String, RedisValue> store = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ValueEntry> store = new ConcurrentHashMap<>();
+
+    /** Check expiration lazily: if expired, remove and return true; else false. */
+    private boolean removeIfExpired(String key, ValueEntry entry) {
+        Long exp = entry.getExpirationTime();
+        if(exp != null && System.currentTimeMillis() >= exp) {
+            store.remove(key, entry); // remove only if it matches the current entry
+            return true; // expired
+        }
+        return false; // not expired
+    }
+
+    private ValueEntry peekEntry(String key) {
+        ValueEntry entry = store.get(key);
+        if (entry == null || removeIfExpired(key, entry)) {
+            return null; // entry is missing or expired
+        }
+        return entry; // valid entry
+    }
 
     // ----- String Commands -----
 
     /** GET key: returns the string or null if missing */
     public String getString(String key) {
-        RedisValue v = store.get(key);
-        if (v == null) {
+        ValueEntry entry = peekEntry(key);
+        if (entry == null) {
             return null;
         }
+        RedisValue v = entry.getValue();
         if (!(v instanceof StringValue)) {
             throw new IllegalStateException("WRONGTYPE Operation against a key holding the wrong kind of value");
         }
@@ -26,34 +45,47 @@ public class DataStore {
     }
 
     /** SET key value: always returns OK */
-    public void setString(String key, String value) {
-        store.put(key, new StringValue(value));
+    public void setString(String key, String value, Long exSeconds) {
+        Long expirationTime = null; // no expiration by default
+        if(exSeconds != null) {
+            expirationTime = System.currentTimeMillis() + exSeconds * 1000; // convert to milliseconds
+        }
+        store.put(key, new ValueEntry(new StringValue(value), expirationTime));
     }
 
     /** INCR key: atomically parse, increment, and store the new value */
     public long incr(String key) {
-        // compute() returns the new RedisValue (never null here)
-        RedisValue newVal = store.compute(key, (k, old) -> {
-            long current = 0;
-            if (old != null) {
-                if (!(old instanceof StringValue)) {
-                    throw new IllegalStateException(
-                            "WRONGTYPE Operation against a key holding the wrong kind of value");
+        while (true) {
+            ValueEntry oldEntry = peekEntry(key);
+            if (oldEntry == null) {
+                // absent or expired: create new entry with value "1", no expiration
+                ValueEntry newEntry = new ValueEntry(new StringValue("1"), 0);
+                if (store.putIfAbsent(key, newEntry) == null) {
+                    return 1L;
                 }
-                String s = ((StringValue) old).getValue();
-                current = Long.parseLong(s); // may throw NumberFormatException
+                // else race: someone else inserted; retry
+            } else {
+                RedisValue oldVal = oldEntry.getValue();
+                if (!(oldVal instanceof StringValue)) {
+                    throw new IllegalStateException("WRONGTYPE Operation against a key holding the wrong kind of value");
+                }
+                String s = ((StringValue) oldVal).getValue();
+                long curr;
+                try {
+                    curr = Long.parseLong(s);
+                } catch (NumberFormatException e) {
+                    throw new NumberFormatException("ERR value is not an integer or out of range");
+                }
+                long next = curr + 1;
+                ValueEntry newEntry = new ValueEntry(new StringValue(Long.toString(next)), oldEntry.getExpirationTime());
+                // Use replace to ensure atomic update
+                boolean replaced = store.replace(key, oldEntry, newEntry);
+                if (replaced) {
+                    return next;
+                }
+                // else retry
             }
-            long next = current + 1;
-            return new StringValue(Long.toString(next));
-        });
-
-        // Now cast and parse
-        if (!(newVal instanceof StringValue)) {
-            throw new IllegalStateException(
-                    "Unexpected type after INCR: " + newVal.getClass().getSimpleName());
         }
-        String resultStr = ((StringValue) newVal).getValue();
-        return Long.parseLong(resultStr);
     }
 
     // ----- Hash Commands -----
