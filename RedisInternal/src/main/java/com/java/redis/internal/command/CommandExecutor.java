@@ -28,6 +28,9 @@ public class CommandExecutor {
         // Sorted Sets
         registry.put("ZADD",   new ZAddCommand(store));
         registry.put("ZRANGE", new ZRangeCommand(store));
+        //TTL
+        registry.put("EXPIRE", new ExpireCommand(store));
+        registry.put("TTL",    new TTLCommand(store));
     }
 
     public RedisReply execute(Command cmd) {

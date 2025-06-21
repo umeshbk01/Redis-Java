@@ -8,7 +8,7 @@ public class ValueEntry implements Serializable{
     private final RedisValue value;
     private final long expirationTime;
     
-    public ValueEntry(RedisValue value, long expirationTime) {
+    public ValueEntry(RedisValue value, Long expirationTime) {
         this.value = value;
         this.expirationTime = expirationTime;
     }
