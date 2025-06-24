@@ -92,14 +92,9 @@ public class Main {
             System.err.println("[ERROR] Server interrupted: " + e.getMessage());
             e.printStackTrace();
         } finally {
-            try {
-                System.out.println("[DEBUG] Stopping Netty server...");
-                server.stop();
-                System.out.println("[DEBUG] Netty server stopped.");
-            } catch (InterruptedException e) {
-                System.err.println("[ERROR] Error during server stop: " + e.getMessage());
-                throw new RuntimeException(e);
-            }
+            System.out.println("[DEBUG] Stopping Netty server...");
+            server.stop();
+            System.out.println("[DEBUG] Netty server stopped.");
             if (scheduler != null) {
                 scheduler.shutdown();
                 System.out.println("[DEBUG] Scheduler shutdown in finally block.");
